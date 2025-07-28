@@ -4,16 +4,14 @@
 - Python 3.7+ installed on your system
 - pip (Python package installer)
 - Git (for version control)
+- Google Gemini API key (for chatbot functionality)
 
 ## Installation Steps
 
 ### 1. Clone/Download the Project
 ```bash
-# If using Git
 git clone <repository-url>
 cd Note_website
-
-# Or download and extract the ZIP file
 ```
 
 ### 2. Create Virtual Environment (Recommended)
@@ -33,17 +31,21 @@ source venv/bin/activate
 ```bash
 # Install all required packages
 pip install -r requirements.txt
-
-# Or install individually:
-pip install Flask Flask-SQLAlchemy Flask-Login google-generativeai python-dotenv
 ```
 
-### 4. Environment Setup (Optional)
-Create a `.env` file in the project root for API keys:
+### 4. Environment Setup (IMPORTANT for AI Chatbot)
+Create a `.env` file in the project root:
+```env
+# Get your API key from: https://makersuite.google.com/app/apikey
+GEMINI_API_KEY=your_actual_google_gemini_api_key_here
+SECRET_KEY=your_random_secret_key_for_flask_sessions
 ```
-GEMINI_API_KEY=your_google_gemini_api_key_here
-SECRET_KEY=your_secret_key_here
-```
+
+**How to get Google Gemini API Key:**
+1. Go to [Google AI Studio](https://makersuite.google.com/app/apikey)
+2. Sign in with your Google account
+3. Create a new API key
+4. Copy the key and paste it in your .env file
 
 ### 5. Run the Application
 ```bash
@@ -52,6 +54,18 @@ python main.py
 ```
 
 The application will be available at: http://localhost:5000
+
+## Environment Variables Explained
+
+- **GEMINI_API_KEY**: Required for AI chatbot functionality
+- **SECRET_KEY**: Used for Flask session security (generate a random string)
+- **DATABASE_URL**: Optional, for production database configuration
+
+## Testing the Chatbot
+1. Register/Login to the application
+2. Click the blue chat icon in the bottom right
+3. Type a message and press Send
+4. The AI should respond (requires valid API key)
 
 ## Project Structure
 ```
@@ -78,16 +92,20 @@ Note_website/
 
 ## Troubleshooting
 
-### Common Issues:
-1. **Module not found**: Make sure virtual environment is activated and dependencies are installed
-2. **Database errors**: Delete `database.db` file and restart the app to recreate
-3. **AI chatbot not working**: Check if GEMINI_API_KEY is properly configured
-4. **Port already in use**: Change port in main.py: `app.run(debug=True, port=5001)`
+### Chatbot Issues:
+- **"API key not configured"**: Check your .env file exists and has correct GEMINI_API_KEY
+- **"AI assistant temporarily unavailable"**: API key might be invalid or quota exceeded
+- **"You have to login or signup"**: Make sure you're logged in before using the chatbot
 
-### Development Mode:
-- Debug mode is enabled by default (auto-reload on code changes)
-- Database is created automatically on first run
-- Flash messages show success/error feedback
+### Common Issues:
+1. **Module not found**: Activate virtual environment and install requirements
+2. **Database errors**: Delete `database.db` and restart app
+3. **Environment variables not loading**: Install python-dotenv: `pip install python-dotenv`
+
+## Development Notes
+- .env file contains sensitive information - never commit it to version control
+- Add .env to your .gitignore file
+- Use different API keys for development and production
 
 ## Team Development
 - Each developer should create their own virtual environment

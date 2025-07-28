@@ -5,6 +5,10 @@ from .model import Note, Task
 from . import db
 import google.generativeai as genai
 import os
+from dotenv import load_dotenv  # Fix this import
+
+# Load environment variables
+load_dotenv()
 
 views = Blueprint('views', __name__)
 
@@ -105,17 +109,23 @@ def chat():
     if not user_message:
         return jsonify({'error': 'No message provided'}), 400
 
-    # Get API key and configure Gemini
-    api_key = os.getenv("GEMINI_API_KEY", "AIzaSyAYIR3-KwAqjdtTmqBN3_030RiiFHeQoFM")
+    # Get API key from environment variable
+    api_key = os.getenv("GEMINI_API_KEY")
+    
+    # Check if API key is available
+    if not api_key:
+        return jsonify({'error': 'API key not configured. Please check your .env file.'}), 500
+    
     try:
+        # Configure Gemini with environment variable
         genai.configure(api_key=api_key)
         model = genai.GenerativeModel('gemini-2.0-flash')
         response = model.generate_content(user_message)
         answer = response.text
         return jsonify({'answer': answer})
     except Exception as e:
-        print("Gemini error:", e)
-        return jsonify({'error': str(e)}), 500
+        print(f"Gemini API error: {e}")
+        return jsonify({'error': 'Sorry, the AI assistant is temporarily unavailable.'}), 500
     
 @views.route('/tasks', methods=['GET', 'POST'])
 @login_required
