@@ -1,0 +1,64 @@
+<!-- Registration page - new user account creation -->
+{% extends "base.html" %} {%block title%}Signup{% endblock %}
+{%block content%}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Create an Account</h2>
+    
+    <!-- Registration form with Bootstrap styling -->
+    <form action="/sign-up" method="POST" class="mx-auto" style="max-width: 400px;">
+        <!-- Username/Display name field -->
+        <div class="mb-3">
+            <label for="username" class="form-label">Username</label>
+            <input 
+                type="text" 
+                class="form-control" 
+                id="Name" 
+                name="Name" 
+                required
+            >   
+        </div>
+        
+        <!-- Email field with validation -->
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input 
+                type="email" 
+                class="form-control" 
+                id="email" 
+                name="email" 
+                required 
+                minlength="6"
+            >
+        </div>
+        
+        <!-- Password field with minimum length -->
+        <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input 
+                type="password" 
+                class="form-control" 
+                id="password" 
+                name="password" 
+                required 
+                minlength="6"
+            >
+        </div>
+        
+        <!-- Password confirmation field -->
+        <div class="mb-3">
+            <label for="password" class="form-label">Confirm Password</label>
+            <input 
+                type="password" 
+                class="form-control" 
+                id="conpass" 
+                name="conpass" 
+                required 
+                minlength="6"
+            >
+        </div>
+        
+        <!-- Submit button -->
+        <button type="submit" class="btn btn-success w-100">Sign Up</button>
+    </form>
+</div>
+{%endblock%}

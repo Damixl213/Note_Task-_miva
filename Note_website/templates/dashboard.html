@@ -1,0 +1,179 @@
+<!-- Dashboard template - read-only view of user's notes and tasks -->
+{% extends "base.html" %} 
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="container">
+    <h2>My Dashboard</h2>
+    
+    <!-- Tab Navigation - switches between notes and tasks view -->
+    <div class="tab-navigation">
+        <button class="tab-btn active" onclick="showTab('notes')">📝 Notes</button>
+        <button class="tab-btn" onclick="showTab('tasks')">✅ Tasks</button>
+    </div>
+    
+<!-- Notes Tab - displays all user notes in read-only format -->
+<div id="notes" class="tab-content active">
+    <div class="book-page">
+        <h3>My Notes</h3>
+        <p class="text-muted">Welcome, {{ user.Name }}!</p>
+        
+        <!-- Loop through user's notes -->
+        {% for note in notes %}
+            <div class="note-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <!-- Display note subject/title -->
+                        <h5 class="note-subject">{{ note.subject }}</h5>
+                        <!-- Show first 100 characters of note content -->
+                        <p class="note-content">{{ note.data[:100] }}{% if note.data|length > 100 %}...{% endif %}</p>
+                        <!-- Format and display creation date -->
+                        <small class="date">{{ note.date.strftime('%Y-%m-%d %H:%M') }}</small>
+                    </div>
+                    <!-- Download button for each note -->
+                    <a href="{{ url_for('views.download_note', id=note.id) }}" class="btn btn-sm btn-outline-primary">
+                        📥 Download
+                    </a>
+                </div>
+            </div>
+        {% else %}
+            <!-- Show message when no notes exist -->
+            <p class="empty-message">No notes yet. Start writing!</p>
+        {% endfor %}
+    </div>
+</div>
+    
+    <!-- Tasks Tab - displays all user tasks -->
+    <div id="tasks" class="tab-content">
+        <div class="book-page">
+            <h3>My Tasks</h3>
+            
+            <!-- Loop through user's tasks -->
+            {% for task in tasks %}
+                <div class="task-card {% if task.completed %}completed{% endif %}">
+                    <!-- Task description -->
+                    <span class="task-text">{{ task.description }}</span>
+                    <!-- Status icon - checkmark for completed, clock for pending -->
+                    <span class="task-status">
+                        {% if task.completed %}✅{% else %}⏳{% endif %}
+                    </span>
+                </div>
+            {% else %}
+                <!-- Show message when no tasks exist -->
+                <p class="empty-message">No tasks yet. Create your first task!</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<style>
+/* Tab navigation styling */
+.tab-navigation {
+    display: flex;
+    margin-bottom: 20px;
+    border-bottom: 3px solid #ddd;
+}
+
+/* Tab button styles */
+.tab-btn {
+    background: #f8f9fa;
+    border: none;
+    padding: 12px 24px;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 8px 8px 0 0;
+    margin-right: 5px;
+    transition: all 0.3s ease;
+}
+
+/* Active tab button */
+.tab-btn.active {
+    background: #007bff;
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* Hide inactive tab content */
+.tab-content {
+    display: none;
+}
+
+/* Show active tab content */
+.tab-content.active {
+    display: block;
+}
+
+/* Main content area styling */
+.book-page {
+    background: white;
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    min-height: 400px;
+    border: 1px solid #e0e0e0;
+}
+
+/* Card styling for notes and tasks */
+.note-card, .task-card {
+    background: #f8f9fa;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border-left: 4px solid #007bff;
+    transition: transform 0.2s ease;
+}
+
+/* Hover effect for cards */
+.note-card:hover, .task-card:hover {
+    transform: translateX(5px);
+}
+
+/* Completed task styling */
+.task-card.completed {
+    border-left-color: #28a745;
+    background: #e8f5e8;
+}
+
+/* Strike-through text for completed tasks */
+.task-card.completed .task-text {
+    text-decoration: line-through;
+    color: #6c757d;
+}
+
+/* Task card layout */
+.task-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Date styling */
+.date {
+    color: #6c757d;
+    font-style: italic;
+}
+
+/* Empty state message */
+.empty-message {
+    text-align: center;
+    color: #6c757d;
+    font-style: italic;
+    margin-top: 50px;
+}
+</style>
+
+<script>
+function showTab(tabName) {
+    // Hide all tab contents
+    const tabs = document.querySelectorAll('.tab-content');
+    tabs.forEach(tab => tab.classList.remove('active'));
+    
+    // Remove active class from all tab buttons
+    const buttons = document.querySelectorAll('.tab-btn');
+    buttons.forEach(btn => btn.classList.remove('active'));
+    
+    // Show selected tab and mark button as active
+    document.getElementById(tabName).classList.add('active');
+    event.target.classList.add('active');
+}
+</script>
+{% endblock %}

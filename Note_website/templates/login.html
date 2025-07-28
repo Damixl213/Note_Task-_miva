@@ -1,0 +1,28 @@
+<!-- Login page - user authentication form -->
+{% extends "base.html" %} {%block title%}login{% endblock %}
+
+{%block content%}
+<div class="body ">
+    <div class="container">
+        <!-- Login form - submits to same route with POST method -->
+        <form method="POST">
+            <div class="head">
+                <span>login </span>
+            </div>
+            <div class="inputs">
+                <!-- Email input field -->
+                <input type="email" placeholder="Email" name="email" id="email">
+                <!-- Password input field -->
+                <input type="password" placeholder="Password" name="password" id="password">
+            </div>
+            <!-- Submit button -->
+            <button>Sign up</button>
+        </form>
+        
+        <!-- Link to registration page for new users -->
+        <div class="form-footer">
+            <p>Have no account? <a href="/sign-up">Signup</a></p> 
+        </div>
+    </div>
+</div>
+{%endblock%}

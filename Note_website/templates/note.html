@@ -1,0 +1,190 @@
+{% extends "base.html" %} {% block title %}Edit Note{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <!-- Page Heading -->
+    <h2 class="text-center mb-4">✏️ Edit Your Note</h2>
+
+    <!-- Edit Note Form -->
+    <div class="writing-card mb-4">
+        <div class="writing-header">
+            <h4>📝 Edit Note</h4>
+            <p class="text-muted mb-0">Make your thoughts shine</p>
+        </div>
+        <form method="POST">
+            <!-- Subject Field -->
+            <div class="form-group mb-3">
+                <input 
+                    type="text" 
+                    name="subject" 
+                    class="form-control subject-input" 
+                    placeholder="📌 What's this about?"
+                    value="{{ note.subject if note.subject else '' }}"
+                    autocomplete="off"
+                    required
+                >
+            </div>
+            
+            <!-- Note Content -->
+            <div class="form-group mb-3">
+                <textarea 
+                    name="note" 
+                    id="note"
+                    class="form-control note-textarea" 
+                    placeholder="💭 Start writing your thoughts here..."
+                    required
+                >{{ note.data }}</textarea>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary btn-lg flex-grow-1">
+                    💾 Save Changes
+                </button>
+                <a href="{{ url_for('views.home') }}" class="btn btn-outline-secondary btn-lg">
+                    🔙 Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Note Info Footer -->
+    <div class="text-center mt-4">
+        <small class="text-muted">
+            📅 Last updated: {{ note.date.strftime('%B %d, %Y at %I:%M %p') if note.date else 'New note' }}
+        </small>
+    </div>
+</div>
+
+<style>
+/* Enhanced Writing Experience */
+.writing-card {
+    background: linear-gradient(145deg, #ffffff, #f8f9fa);
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    border: 1px solid #e9ecef;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.writing-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.writing-header h4 {
+    color: #495057;
+    margin-bottom: 5px;
+}
+
+/* Subject Input */
+.subject-input {
+    font-size: 18px;
+    padding: 15px;
+    border-radius: 10px;
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.subject-input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    transform: translateY(-2px);
+}
+
+/* Note Textarea - Wide and Easy for Typing */
+.note-textarea {
+    font-size: 16px;
+    padding: 20px;
+    border-radius: 10px;
+    border: 2px solid #e9ecef;
+    width: 100%;
+    height: 180px; /* Shorter height for easier typing */
+    min-height: 180px;
+    max-height: 180px;
+    resize: none; /* Remove resize capability */
+    font-family: 'Georgia', serif;
+    line-height: 1.6;
+    transition: all 0.3s ease;
+}
+
+.note-textarea:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    transform: scale(1.01);
+}
+
+/* Make it responsive for different screen sizes */
+@media (min-width: 768px) {
+    .note-textarea {
+        height: 200px;
+        min-height: 200px;
+        max-height: 200px;
+    }
+}
+
+/* Desktop - wider and comfortable for typing */
+@media (min-width: 1200px) {
+    .note-textarea {
+        height: 220px;
+        min-height: 220px;
+        max-height: 220px;
+    }
+}
+
+/* Button styling */
+.btn:hover {
+    transform: translateY(-2px);
+    transition: all 0.3s ease;
+}
+
+.form-control::placeholder {
+    color: #adb5bd;
+    font-style: italic;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .writing-card {
+        margin: 10px;
+        padding: 20px;
+    }
+    
+    .d-flex {
+        flex-direction: column;
+    }
+    
+    .d-flex .btn {
+        margin-bottom: 10px;
+    }
+}
+
+/* Auto-resize for textarea */
+.note-textarea {
+    transition: height 0.3s ease;
+}
+</style>
+
+<script>
+// Focus on the note content when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    const textarea = document.getElementById('note');
+    textarea.focus();
+    textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+});
+
+// Keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+    // Ctrl+S to save
+    if (e.ctrlKey && e.key === 's') {
+        e.preventDefault();
+        document.querySelector('form').submit();
+    }
+    
+    // Ctrl+Escape to cancel
+    if (e.ctrlKey && e.key === 'Escape') {
+        window.location.href = "{{ url_for('views.home') }}";
+    }
+});
+</script>
+{% endblock %}

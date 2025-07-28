@@ -1,0 +1,493 @@
+{% extends "base.html" %} {% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh;">
+    <!-- Page Heading -->
+    <h2 class="text-center mb-4" style="color: white;">📝 My Notes & Tasks</h2>
+
+    <!-- Tab Navigation -->
+    <div class="tab-navigation mb-4">
+        <button class="tab-btn active" onclick="showTab('notes')">📝 Notes</button>
+        <button class="tab-btn" onclick="showTab('tasks')">✅ Tasks</button>
+    </div>
+
+    <!-- Notes Section -->
+    <div id="notes" class="tab-content active">
+        <!-- Add Note Form -->
+        <div class="row justify-content-center mb-4">
+            <div class="col-12 col-lg-8 col-xl-6">
+                <div class="card shadow-lg border-0 rounded-lg">
+                    <div class="card-header bg-white text-center py-4">
+                        <h3 class="mb-0 text-primary">✍️ Quick Note</h3>
+                        <p class="text-muted mb-0">Capture your thoughts instantly</p>
+                    </div>
+                    <div class="card-body p-4">
+                        <form method="POST" action="{{ url_for('views.home') }}">
+                            <!-- Subject Field -->
+                            <div class="form-group mb-4">
+                                <label for="subject" class="form-label fw-bold text-dark">📝 Subject</label>
+                                <input 
+                                    type="text" 
+                                    name="subject" 
+                                    id="subject" 
+                                    class="form-control form-control-lg" 
+                                    placeholder="📌 What's this about? (e.g., Meeting Notes, Ideas, Reminders)"
+                                    style="border-radius: 10px; border: 2px solid #e9ecef; font-size: 18px;"
+                                    autocomplete="off"
+                                    required
+                                >
+                            </div>
+                            
+                            <!-- Note Content -->
+                            <div class="form-group mb-4">
+                                <label for="note" class="form-label fw-bold text-dark">📄 Your Note</label>
+                                <textarea 
+                                    name="note" 
+                                    id="noteTextarea"
+                                    class="form-control" 
+                                    rows="8" 
+                                    placeholder="💭 Start writing your thoughts here...
+
+Tips:
+• Jot down ideas as they come
+• Use bullet points for lists
+• Add dates and times
+• Keep it simple and clear"
+                                    style="
+                                        border-radius: 10px; 
+                                        border: 2px solid #e9ecef; 
+                                        font-size: 16px; 
+                                        line-height: 1.6;
+                                        min-height: 200px;
+                                        resize: vertical;
+                                        font-family: 'Georgia', serif;
+                                    "
+                                    required
+                                ></textarea>
+                            </div>
+                            
+                            <!-- Action Buttons -->
+                            <div class="row g-3 mt-4">
+                                <div class="col-md-8">
+                                    <button 
+                                        type="submit" 
+                                        class="btn btn-success btn-lg w-100 rounded-pill shadow-sm"
+                                        style="font-weight: 600; letter-spacing: 0.5px;"
+                                    >
+                                        💾 Save Note
+                                    </button>
+                                </div>
+                                <div class="col-md-4">
+                                    <button 
+                                        type="button" 
+                                        class="btn btn-outline-secondary btn-lg w-100 rounded-pill"
+                                        style="font-weight: 600; letter-spacing: 0.5px;"
+                                        onclick="clearForm()"
+                                    >
+                                        🗑️ Clear
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Display Notes -->
+        {% if notes %}
+            <div class="notes-grid">
+                {% for note in notes %}
+                    <div class="note-card">
+                        <div class="note-header">
+                            <h5 class="note-title">{{ note.subject }}</h5>
+                            <small class="note-date">{{ note.date.strftime('%b %d, %Y') }}</small>
+                        </div>
+                        <div class="note-body">
+                            <p>{{ note.data[:150] }}{% if note.data|length > 150 %}...{% endif %}</p>
+                        </div>
+                        <div class="note-actions">
+                            <a href="{{ url_for('views.edit_note', id=note.id) }}" class="btn btn-sm btn-outline-primary">✏️ Edit</a>
+                            <a href="{{ url_for('views.download_note', id=note.id) }}" class="btn btn-sm btn-outline-info">📥 Download</a>
+                            <form action="{{ url_for('views.delete_note', id=note.id) }}" method="POST" style="display:inline;">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this note?')">🗑️</button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">📝</div>
+                <h4 style="color: white;">Start Your First Note</h4>
+                <p style="color: #e0e6ff;">Capture your thoughts, ideas, and important information above!</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Tasks Section -->
+    <div id="tasks" class="tab-content">
+        <!-- Add Task Form -->
+        <div class="row justify-content-center mb-4">
+            <div class="col-12 col-lg-8 col-xl-6">
+                <div class="card shadow-lg border-0 rounded-lg">
+                    <div class="card-header bg-white text-center py-4">
+                        <h3 class="mb-0 text-primary">✅ Quick Task</h3>
+                        <p class="text-muted mb-0">Add something to your to-do list</p>
+                    </div>
+                    <div class="card-body p-4">
+                        <form action="{{ url_for('views.tasks') }}" method="POST">
+                            <div class="input-group input-group-lg">
+                                <input 
+                                    type="text" 
+                                    name="description" 
+                                    class="form-control" 
+                                    placeholder="🎯 What needs to be done? (e.g., Call dentist, Buy groceries, Finish report)"
+                                    style="border-radius: 10px 0 0 10px; border: 2px solid #e9ecef; font-size: 16px;"
+                                    autocomplete="off"
+                                    required
+                                >
+                                <button type="submit" class="btn btn-primary btn-lg" style="border-radius: 0 10px 10px 0;">
+                                    ➕ Add Task
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Display Tasks -->
+        {% if tasks %}
+            <div class="tasks-container">
+                {% for task in tasks %}
+                    <div class="task-item {{ 'completed' if task.completed else '' }}">
+                        <div class="task-content">
+                            <span class="task-text">{{ task.description }}</span>
+                        </div>
+                        <div class="task-actions">
+                            {% if not task.completed %}
+                                <form action="{{ url_for('views.toggle_task', id=task.id) }}" method="POST" style="display:inline;">
+                                    <button type="submit" class="btn btn-sm btn-success">✅ Done</button>
+                                </form>
+                            {% else %}
+                                <span class="completed-badge">✅ Completed</span>
+                            {% endif %}
+                            <form action="{{ url_for('views.delete_task', id=task.id) }}" method="POST" style="display:inline;">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this task?')">🗑️</button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">✅</div>
+                <h4 style="color: white;">No Tasks Yet</h4>
+                <p style="color: #e0e6ff;">Add your first task above to get started!</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+/* Custom styles for better experience */
+#noteTextarea:focus, #subject:focus {
+    border-color: #667eea !important;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25) !important;
+    outline: none;
+}
+
+#noteTextarea {
+    background: #fefefe;
+    transition: all 0.3s ease;
+}
+
+#noteTextarea:focus {
+    background: #fff;
+    transform: scale(1.01);
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    transition: all 0.3s ease;
+}
+
+.card {
+    transition: all 0.3s ease;
+}
+
+.form-control::placeholder {
+    color: #adb5bd;
+    font-style: italic;
+}
+
+/* Notes Grid */
+.notes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.note-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border: 1px solid #e9ecef;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.note-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+.note-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.note-title {
+    color: #495057;
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.note-date {
+    color: #6c757d;
+    font-size: 12px;
+}
+
+.note-body p {
+    color: #6c757d;
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+.note-actions {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+/* Tasks */
+.tasks-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.task-item {
+    background: white;
+    padding: 15px 20px;
+    border-radius: 10px;
+    border-left: 4px solid #007bff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.task-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+}
+
+.task-item.completed {
+    border-left-color: #28a745;
+    background: #f8f9fa;
+}
+
+.task-item.completed .task-text {
+    text-decoration: line-through;
+    color: #6c757d;
+}
+
+.task-content {
+    flex-grow: 1;
+}
+
+.task-text {
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.task-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.completed-badge {
+    background: #28a745;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 15px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+/* Empty States */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #6c757d;
+}
+
+.empty-icon {
+    font-size: 48px;
+    margin-bottom: 15px;
+}
+
+/* Tab Navigation */
+.tab-navigation {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+
+.tab-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    padding: 15px 30px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    border-radius: 25px;
+    margin: 0 8px;
+    transition: all 0.3s ease;
+    color: white;
+    backdrop-filter: blur(10px);
+}
+
+.tab-btn.active {
+    background: rgba(255, 255, 255, 0.9);
+    color: #667eea;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3);
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .notes-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .task-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .task-actions {
+        align-self: flex-end;
+    }
+}
+</style>
+
+<script>
+function showTab(tabName) {
+    // Hide all tab contents
+    const tabs = document.querySelectorAll('.tab-content');
+    tabs.forEach(tab => tab.classList.remove('active'));
+    
+    // Remove active class from all buttons
+    const buttons = document.querySelectorAll('.tab-btn');
+    buttons.forEach(btn => btn.classList.remove('active'));
+    
+    // Show selected tab and mark button as active
+    document.getElementById(tabName).classList.add('active');
+    event.target.classList.add('active');
+}
+
+// Clear form function
+function clearForm() {
+    document.querySelector('input[name="subject"]').value = '';
+    document.querySelector('textarea[name="note"]').value = '';
+    document.querySelector('input[name="subject"]').focus();
+}
+
+// Auto-resize textarea
+document.addEventListener('DOMContentLoaded', function() {
+    const textarea = document.getElementById('noteTextarea');
+    
+    if (textarea) {
+        function autoResize() {
+            textarea.style.height = 'auto';
+            textarea.style.height = Math.max(200, textarea.scrollHeight) + 'px';
+        }
+        
+        textarea.addEventListener('input', autoResize);
+        
+        // Focus on subject field when page loads
+        document.querySelector('input[name="subject"]').focus();
+    }
+});
+
+// Keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+    // Ctrl+Enter to submit note form
+    if (e.ctrlKey && e.key === 'Enter') {
+        const activeTab = document.querySelector('.tab-content.active');
+        const form = activeTab.querySelector('form');
+        if (form) {
+            form.submit();
+        }
+    }
+});
+
+// Auto-save draft functionality (optional)
+let draftTimeout;
+function saveDraft() {
+    clearTimeout(draftTimeout);
+    draftTimeout = setTimeout(() => {
+        const subject = document.querySelector('input[name="subject"]').value;
+        const note = document.querySelector('textarea[name="note"]').value;
+        if (subject || note) {
+            localStorage.setItem('noteDraft', JSON.stringify({subject, note}));
+        }
+    }, 1000);
+}
+
+// Load draft on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const draft = localStorage.getItem('noteDraft');
+    if (draft) {
+        const {subject, note} = JSON.parse(draft);
+        if (subject) document.querySelector('input[name="subject"]').value = subject;
+        if (note) document.querySelector('textarea[name="note"]').value = note;
+    }
+    
+    // Add event listeners for auto-save
+    const subjectInput = document.querySelector('input[name="subject"]');
+    const noteTextarea = document.querySelector('textarea[name="note"]');
+    
+    if (subjectInput) subjectInput.addEventListener('input', saveDraft);
+    if (noteTextarea) noteTextarea.addEventListener('input', saveDraft);
+});
+
+// Clear draft when form is submitted
+document.querySelector('form[action*="home"]').addEventListener('submit', function() {
+    localStorage.removeItem('noteDraft');
+});
+</script>
+{% endblock %}
