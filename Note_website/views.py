@@ -60,7 +60,7 @@ def download_note(id):
     # Return as downloadable file
     response = make_response(content)
     response.headers['Content-Type'] = 'text/plain'
-    response.headers['Content-Disposition'] = f'attachment; filename="{note.subject}.txt"'
+    response.headers['Content-Disposition'] = f'attachment; filename="{note.subject}.docx"'
     return response
 
 @views.route('/delete-note/<int:id>', methods=['POST'])
