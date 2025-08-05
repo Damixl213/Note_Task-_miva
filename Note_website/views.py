@@ -3,7 +3,6 @@ from flask import Blueprint, render_template, request, flash, redirect, url_for,
 from flask_login import login_required, current_user
 from .model import Note, Task
 from . import db
-import google.generativeai as genai
 import os
 from dotenv import load_dotenv  # Fix this import
 
@@ -101,32 +100,7 @@ def edit_note(id):
     
     return render_template('note.html', note=note, user=current_user)
 
-@views.route('/chat', methods=['POST'])
-@login_required
-def chat():
-    # AI chatbot using Google Gemini
-    user_message = request.json.get('message')
-    if not user_message:
-        return jsonify({'error': 'No message provided'}), 400
 
-    # Get API key from environment variable
-    api_key = os.getenv("GEMINI_API_KEY")
-    
-    # Check if API key is available
-    if not api_key:
-        return jsonify({'error': 'API key not configured. Please check your .env file.'}), 500
-    
-    try:
-        # Configure Gemini with environment variable
-        genai.configure(api_key=api_key)
-        model = genai.GenerativeModel('gemini-2.0-flash')
-        response = model.generate_content(user_message)
-        answer = response.text
-        return jsonify({'answer': answer})
-    except Exception as e:
-        print(f"Gemini API error: {e}")
-        return jsonify({'error': 'Sorry, the AI assistant is temporarily unavailable.'}), 500
-    
 @views.route('/tasks', methods=['GET', 'POST'])
 @login_required
 def tasks():
